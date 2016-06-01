@@ -1,5 +1,6 @@
 package com.udacity.matanaliz.sunshine;
 
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -308,8 +309,13 @@ public class SunshineFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String text = mForecastAdapter.getItem(position);
-                Toast toast = Toast.makeText(getActivity().getApplicationContext(), text, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT);
                 toast.show();
+
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, text);
+                
+                startActivity(intent);
             }
         });
 
