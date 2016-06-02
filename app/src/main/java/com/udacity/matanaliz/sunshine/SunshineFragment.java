@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -256,20 +257,8 @@ public class SunshineFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            
-            SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-            String currentLocation = settings.getString(getString(R.string.pref_location_key),
-                    getString(R.string.pref_location_default_value));
 
-            ConnectivityManager connMgr = (ConnectivityManager)
-                    getActivity().getSystemService(getContext().CONNECTIVITY_SERVICE);
-
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
-                new DownloadForecastTask().execute(currentLocation);
-            } else {
-                Log.e(LOG_TAG, "Network is unavailable.");
-            }
+            updateWeather();
             return true;
         }
 
@@ -284,25 +273,36 @@ public class SunshineFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateWeather() {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String currentLocation = settings.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default_value));
+
+        Toast toast = Toast.makeText(getActivity(), currentLocation, Toast.LENGTH_SHORT);
+        toast.show();
+
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getActivity().getSystemService(getContext().CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new DownloadForecastTask().execute(currentLocation);
+        } else {
+            Log.e(LOG_TAG, "Network is unavailable.");
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-        String [] forecastArray = {
-                "Today - Rain - 22",
-                "Tomorrow - Rain - 21",
-                "Sunday - Rain - 20",
-                "Monday - Rain - 21",
-                "Tuesday - Rain - 21",
-                "Wednesday - Rain - 21",
-                "Thursday - Rain - 21",
-                "Friday - Sunny - 23"
-        };
-
-        List<String> itemList = new ArrayList<String>(
-                Arrays.asList(forecastArray));
 
         mForecastAdapter =
                 new ArrayAdapter<String>(
@@ -312,7 +312,7 @@ public class SunshineFragment extends Fragment {
                         R.layout.list_item_forecast,
                         // Id of view inside of layout xml file
                         R.id.list_item_forecast_textview,
-                        itemList);
+                        new ArrayList<String>());
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);

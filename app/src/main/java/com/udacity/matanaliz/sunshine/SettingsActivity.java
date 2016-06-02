@@ -78,12 +78,6 @@ public class SettingsActivity extends PreferenceActivity
         } else {
             // For other preferences, set the summary to the value's simple string representation.
             preference.setSummary(stringValue);
-
-            SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = settings.edit();
-
-            editor.putString(getString(R.string.pref_location_key), stringValue);
-            editor.commit();
         }
         return true;
     }
