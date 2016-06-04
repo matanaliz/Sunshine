@@ -139,6 +139,15 @@ public class SunshineFragment extends Fragment {
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
 
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String units = settings.getString(getString(R.string.pref_units_key),
+                        getString(R.string.pref_units_default_value));
+
+                if (units != getString(R.string.pref_units_default_value)) {
+                    high = high * 1.8 + 32;
+                    low = low * 1.8 + 32;
+                }
+
                 highAndLow = formatHighLows(high, low);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
