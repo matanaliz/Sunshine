@@ -270,11 +270,30 @@ public class SunshineFragment extends Fragment {
             updateWeather();
             return true;
         }
-
         if (id == R.id.action_settings) {
 
             Intent intent = new Intent(getActivity(), SettingsActivity.class);
             startActivity(intent);
+
+            return true;
+        }
+        if (id == R.id.action_location) {
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
+
+            Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
+                    .appendQueryParameter("q", location)
+                    .build();
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(geoLocation);
+
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivity(intent);
+            } else {
+                Log.d(LOG_TAG, "Unable to start implicit intent to open map for location" + location);
+            }
 
             return true;
         }
