@@ -165,8 +165,6 @@ public class SunshineFragment extends Fragment {
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
-            // Who even cares bout my appid
-            String apiKey = "0186af915d4ac7620da24230fcdf8491";
             String forecastJsonStr = null;
 
             final int daysCount = 7;
@@ -182,7 +180,7 @@ public class SunshineFragment extends Fragment {
                     .appendQueryParameter(QUERY_PARAM, location[0])
                     .appendQueryParameter(UNITS_PARAM, "metric")
                     .appendQueryParameter(DAY_COUNT_PARAM, Integer.toString(7))
-                    .appendQueryParameter(APP_KEY_PARAM, apiKey).build();
+                    .appendQueryParameter(APP_KEY_PARAM, BuildConfig.OPEN_WEATHER_API_KEY).build();
 
                 URL url = new URL(builtUri.toString());
                 // Create the request to OpenWeatherMap, and open the connection
