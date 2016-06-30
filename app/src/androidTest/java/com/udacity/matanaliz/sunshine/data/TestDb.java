@@ -16,6 +16,7 @@
 package com.udacity.matanaliz.sunshine.data;
 
 import android.test.AndroidTestCase;
+import com.udacity.matanaliz.sunshine.data.WeatherDbHelper;
 
 public class TestDb extends AndroidTestCase {
 
