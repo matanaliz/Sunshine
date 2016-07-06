@@ -15,6 +15,7 @@
  */
 package com.udacity.matanaliz.sunshine.data;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
@@ -113,22 +114,45 @@ public class TestDb extends AndroidTestCase {
     */
     public void testLocationTable() {
         // First step: Get reference to writable database
+        SQLiteDatabase db = new WeatherDbHelper(
+                this.mContext).getWritableDatabase();
+        assertEquals(true, db.isOpen());
 
         // Create ContentValues of what you want to insert
         // (you can use the createNorthPoleLocationValues if you wish)
+        ContentValues locationValue = TestUtilities.createNorthPoleLocationValues();
 
         // Insert ContentValues into database and get a row ID back
+        long rowId;
+        rowId = db.insert(WeatherContract.LocationEntry.TABLE_NAME, null, locationValue);
+
+        assertTrue(rowId != -1);
 
         // Query the database and receive a Cursor back
+        Cursor c = db.query(WeatherContract.LocationEntry.TABLE_NAME, //table
+                null, //
+                null,
+                null,
+                null,
+                null,
+                null,
+                null //sort order
+                );
 
         // Move the cursor to a valid database row
+        assertTrue("No Records returned from location query" ,c.moveToFirst());
 
         // Validate data in resulting Cursor with the original ContentValues
         // (you can use the validateCurrentRecord function in TestUtilities to validate the
         // query if you like)
 
-        // Finally, close the cursor and database
+        TestUtilities.validateCurrentRecord("Location Query validation failed", c, locationValue);
 
+        assertFalse( "More than one record returned from location query", c.moveToNext());
+
+        // Finally, close the cursor and database
+        c.close();
+        db.close();
     }
 
     /*
