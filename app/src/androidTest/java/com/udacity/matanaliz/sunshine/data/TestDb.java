@@ -118,13 +118,8 @@ public class TestDb extends AndroidTestCase {
                 this.mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
 
-        // Create ContentValues of what you want to insert
-        // (you can use the createNorthPoleLocationValues if you wish)
         ContentValues locationValue = TestUtilities.createNorthPoleLocationValues();
-
-        // Insert ContentValues into database and get a row ID back
-        long rowId;
-        rowId = db.insert(WeatherContract.LocationEntry.TABLE_NAME, null, locationValue);
+        long rowId = insertLocationTable(db, locationValue);
 
         assertTrue(rowId != -1);
 
@@ -137,7 +132,7 @@ public class TestDb extends AndroidTestCase {
                 null,
                 null,
                 null //sort order
-                );
+        );
 
         // Move the cursor to a valid database row
         assertTrue("No Records returned from location query" ,c.moveToFirst());
@@ -152,7 +147,20 @@ public class TestDb extends AndroidTestCase {
 
         // Finally, close the cursor and database
         c.close();
+
         db.close();
+    }
+
+    public long insertLocationTable(SQLiteDatabase db, ContentValues locationValue) {
+        // Create ContentValues of what you want to insert
+        // (you can use the createNorthPoleLocationValues if you wish)
+
+
+        // Insert ContentValues into database and get a row ID back
+        long rowId;
+        rowId = db.insert(WeatherContract.LocationEntry.TABLE_NAME, null, locationValue);
+
+        return rowId;
     }
 
     /*
@@ -162,6 +170,9 @@ public class TestDb extends AndroidTestCase {
         also make use of the validateCurrentRecord function from within TestUtilities.
      */
     public void testWeatherTable() {
+        SQLiteDatabase db = new WeatherDbHelper(
+                this.mContext).getWritableDatabase();
+        assertEquals(true, db.isOpen());
         // First insert the location, and then use the locationRowId to insert
         // the weather. Make sure to cover as many failure cases as you can.
 
@@ -169,23 +180,43 @@ public class TestDb extends AndroidTestCase {
         // we can move this code to insertLocation and then call insertLocation from both
         // tests. Why move it? We need the code to return the ID of the inserted location
         // and our testLocationTable can only return void because it's a test.
+        ContentValues locationValue = TestUtilities.createNorthPoleLocationValues();
+
+        long locationRowId = insertLocationTable(db, locationValue);
+        assertTrue(locationRowId != -1);
 
         // First step: Get reference to writable database
 
         // Create ContentValues of what you want to insert
         // (you can use the createWeatherValues TestUtilities function if you wish)
+        ContentValues weatherValue = TestUtilities.createWeatherValues(locationRowId);
 
         // Insert ContentValues into database and get a row ID back
+        long weatherRowId = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, weatherValue);
+        assertTrue(weatherRowId != -1);
 
         // Query the database and receive a Cursor back
-
+        Cursor c = db.query(WeatherContract.WeatherEntry.TABLE_NAME, //table
+                null, //
+                null,
+                null,
+                null,
+                null,
+                null,
+                null //sort order
+        );
+        assertTrue("No Records returned from weather query", c.moveToFirst());
         // Move the cursor to a valid database row
+
 
         // Validate data in resulting Cursor with the original ContentValues
         // (you can use the validateCurrentRecord function in TestUtilities to validate the
         // query if you like)
+        TestUtilities.validateCurrentRecord("Weather Query validation failed", c, weatherValue);
 
         // Finally, close the cursor and database
+        c.close();
+        db.close();
     }
 
 
@@ -194,7 +225,7 @@ public class TestDb extends AndroidTestCase {
         code from testLocationTable to here so that you can call this code from both
         testWeatherTable and testLocationTable.
      */
-    public long insertLocation() {
-        return -1L;
-    }
+    //public long insertLocation() {
+//        return -1L;
+//    }
 }
