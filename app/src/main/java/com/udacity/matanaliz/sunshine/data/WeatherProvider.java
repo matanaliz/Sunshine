@@ -303,6 +303,7 @@ public class WeatherProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case WEATHER: {
+                normalizeDate(values);
                 rowsUpdated = db.update(WeatherContract.WeatherEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             }
