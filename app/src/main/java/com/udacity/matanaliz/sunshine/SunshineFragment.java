@@ -3,6 +3,7 @@ package com.udacity.matanaliz.sunshine;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -24,6 +25,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.udacity.matanaliz.sunshine.data.WeatherContract;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,7 +47,7 @@ import java.util.List;
  */
 public class SunshineFragment extends Fragment {
 
-    private ArrayAdapter<String> mForecastAdapter;
+    private ForecastAdapter mForecastAdapter;
 
     private final String LOG_TAG = SunshineFragment.class.getSimpleName();
 
@@ -101,21 +104,15 @@ public class SunshineFragment extends Fragment {
     }
 
     private void updateWeather() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String currentLocation = settings.getString(getString(R.string.pref_location_key),
-                getString(R.string.pref_location_default_value));
-
-        FetchWeatherTask task = new FetchWeatherTask(getContext(), mForecastAdapter);
-
-        Toast toast = Toast.makeText(getActivity(), currentLocation, Toast.LENGTH_SHORT);
-        toast.show();
+        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
+        String location = Utility.getPreferredLocation(getActivity());
 
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(getContext().CONNECTIVITY_SERVICE);
 
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            task.execute(currentLocation);
+            weatherTask.execute(location);
         } else {
             Log.e(LOG_TAG, "Network is unavailable.");
         }
@@ -133,29 +130,36 @@ public class SunshineFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mForecastAdapter =
-                new ArrayAdapter<String>(
-                        // Context of the Activity
-                        getActivity(),
-                        // Name of layout file
-                        R.layout.list_item_forecast,
-                        // Id of view inside of layout xml file
-                        R.id.list_item_forecast_textview,
-                        new ArrayList<String>());
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+
+        // Sort order:  Ascending, by date.
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
+
+        Cursor cur = getActivity().getContentResolver().query(weatherForLocationUri,
+                null, null, null, sortOrder);
+
+        mForecastAdapter = new ForecastAdapter(getActivity(), cur, 0);
+//                new ArrayAdapter<String>(
+//                        // Context of the Activity
+//                        getActivity(),
+//                        // Name of layout file
+//                        R.layout.list_item_forecast,
+//                        // Id of view inside of layout xml file
+//                        R.id.list_item_forecast_textview,
+//                        new ArrayList<String>());
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String text = mForecastAdapter.getItem(position);
-                Toast toast = Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT);
-                toast.show();
-
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, text);
-
-                startActivity(intent);
+//                String text = mForecastAdapter.getItem(position);
+//                Intent intent = new Intent(getActivity(), DetailActivity.class)
+//                        .putExtra(Intent.EXTRA_TEXT, text);
+//
+//                startActivity(intent);
             }
         });
 
