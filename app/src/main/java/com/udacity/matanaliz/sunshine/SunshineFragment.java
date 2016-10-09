@@ -12,6 +12,9 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,15 +48,45 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SunshineFragment extends Fragment {
+public class SunshineFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int FORECAST_LOADER = 0;
     private ForecastAdapter mForecastAdapter;
 
     private final String LOG_TAG = SunshineFragment.class.getSimpleName();
 
     @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+
+        // Sort order:  Ascending, by date.
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                        locationSetting, System.currentTimeMillis());
+
+        return new CursorLoader(getActivity(),
+                    weatherForLocationUri,
+                    null,
+                    null,
+                    null,
+                    sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mForecastAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mForecastAdapter.swapCursor(null);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
 
         setHasOptionsMenu(true);
     }
@@ -141,14 +174,6 @@ public class SunshineFragment extends Fragment {
                 null, null, null, sortOrder);
 
         mForecastAdapter = new ForecastAdapter(getActivity(), cur, 0);
-//                new ArrayAdapter<String>(
-//                        // Context of the Activity
-//                        getActivity(),
-//                        // Name of layout file
-//                        R.layout.list_item_forecast,
-//                        // Id of view inside of layout xml file
-//                        R.id.list_item_forecast_textview,
-//                        new ArrayList<String>());
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
