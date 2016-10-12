@@ -11,12 +11,23 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String mLocation;
+    private static final String FORECASTFRAGMENT_TAG = "FFTAG";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mLocation = Utility.getPreferredLocation(this);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment, new SunshineFragment(), FORECASTFRAGMENT_TAG)
+                    .commit();
+        }
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -26,5 +37,20 @@ public class MainActivity extends AppCompatActivity {
 //                        .setAction("Action", null).show();
 //            }
 //        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String newLocation = Utility.getPreferredLocation(this);
+        if (newLocation != null && newLocation.equals(mLocation)) {
+            SunshineFragment sf = (SunshineFragment)getSupportFragmentManager()
+                    .findFragmentByTag(FORECASTFRAGMENT_TAG);
+            if (sf != null) {
+                sf.onLocationChanged();
+            }
+            mLocation = newLocation;
+        }
     }
 }

@@ -85,6 +85,11 @@ public class SunshineFragment extends Fragment implements LoaderManager.LoaderCa
 
     private final String LOG_TAG = SunshineFragment.class.getSimpleName();
 
+    public void onLocationChanged() {
+        updateWeather();
+        getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         String locationSetting = Utility.getPreferredLocation(getActivity());
@@ -179,12 +184,6 @@ public class SunshineFragment extends Fragment implements LoaderManager.LoaderCa
         } else {
             Log.e(LOG_TAG, "Network is unavailable.");
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateWeather();
     }
 
     @Override
