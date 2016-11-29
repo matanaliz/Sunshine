@@ -23,11 +23,11 @@ public class MainActivity extends AppCompatActivity {
 
         mLocation = Utility.getPreferredLocation(this);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment, new SunshineFragment(), FORECASTFRAGMENT_TAG)
-                    .commit();
-        }
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.fragment, new SunshineFragment(), FORECASTFRAGMENT_TAG)
+//                    .commit();
+//        }
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
