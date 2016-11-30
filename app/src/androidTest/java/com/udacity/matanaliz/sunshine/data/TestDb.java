@@ -19,7 +19,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
-import com.udacity.matanaliz.sunshine.data.WeatherDbHelper;
 
 import java.util.HashSet;
 

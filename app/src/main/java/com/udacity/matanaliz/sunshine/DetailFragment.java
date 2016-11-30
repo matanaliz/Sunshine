@@ -2,17 +2,13 @@ package com.udacity.matanaliz.sunshine;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,10 +18,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.udacity.matanaliz.sunshine.data.WeatherContract;
-
-import org.w3c.dom.Text;
-
-import java.util.zip.Inflater;
 
 /**
  * A placeholder fragment containing a simple view.
